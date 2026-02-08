@@ -1,0 +1,27 @@
+body {
+  background: #f6f7fb;
+}
+
+.card {
+  border: 0;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.08);
+  border-radius: 16px;
+}
+
+.table thead th {
+  font-weight: 600;
+}
+
+.badge-status {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+pre.content-view {
+  background: #0b1020;
+  color: #e6e6e6;
+  padding: 16px;
+  border-radius: 12px;
+  max-height: 320px;
+  overflow: auto;
+}

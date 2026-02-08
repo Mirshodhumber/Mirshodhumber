@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Document Intake Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-white border-bottom">
+  <div class="container py-2">
+    <span class="navbar-brand fw-bold">Document Intake Portal</span>
+    <div class="ms-auto d-flex gap-2">
+      <button id="btnRefresh" class="btn btn-outline-secondary btn-sm">Refresh</button>
+      <button id="btnExport" class="btn btn-primary btn-sm">Generate Daily Export</button>
+    </div>
+  </div>
+</nav>
+
+<main class="container my-4">
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3">Create Document</h5>
+
+          <div id="alertArea"></div>
+
+          <form id="createForm" autocomplete="off">
+            <div class="mb-3">
+              <label class="form-label">Client Reference</label>
+              <input type="text" class="form-control" id="clientRef" placeholder="CLI-1024" required>
+              <div class="form-text">Format: CLI-####</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Document Type</label>
+              <select class="form-select" id="docType" required>
+                <option value="">Select type</option>
+                <option value="ID_PROOF">ID_PROOF</option>
+                <option value="ADDRESS_PROOF">ADDRESS_PROOF</option>
+                <option value="BANK_STATEMENT">BANK_STATEMENT</option>
+                <option value="SIGNED_FORM">SIGNED_FORM</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Filename</label>
+              <input type="text" class="form-control" id="filename" placeholder="consent.txt" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Content Type</label>
+              <select class="form-select" id="contentType" required>
+                <option value="text/plain">text/plain</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Document Content</label>
+              <textarea class="form-control" id="content" rows="6" placeholder="Paste document text here" required></textarea>
+              <div class="form-text">Content is stored in the file system as a separate blob file.</div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-success">Submit</button>
+              <button type="button" id="btnReset" class="btn btn-outline-secondary">Reset</button>
+            </div>
+          </form>
+
+          <hr class="my-4"/>
+
+          <h6 class="fw-bold mb-2">Filters</h6>
+          <div class="row g-2">
+            <div class="col-md-6">
+              <select class="form-select" id="filterStatus">
+                <option value="">All Statuses</option>
+                <option value="RECEIVED">RECEIVED</option>
+                <option value="VALIDATED">VALIDATED</option>
+                <option value="QUEUED">QUEUED</option>
+                <option value="PROCESSED">PROCESSED</option>
+                <option value="REJECTED">REJECTED</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <select class="form-select" id="filterType">
+                <option value="">All Types</option>
+                <option value="ID_PROOF">ID_PROOF</option>
+                <option value="ADDRESS_PROOF">ADDRESS_PROOF</option>
+                <option value="BANK_STATEMENT">BANK_STATEMENT</option>
+                <option value="SIGNED_FORM">SIGNED_FORM</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <input class="form-control" id="filterClientRef" placeholder="Search by clientRef fragment">
+            </div>
+            <div class="col-12 d-flex gap-2">
+              <button id="btnApplyFilters" class="btn btn-outline-primary btn-sm">Apply Filters</button>
+              <button id="btnClearFilters" class="btn btn-outline-secondary btn-sm">Clear</button>
+            </div>
+          </div>
+
+          <div class="mt-3 small text-muted" id="exportInfo"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fw-bold mb-0">Documents</h5>
+            <span class="text-muted small" id="countLabel"></span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Client</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="docTable"></tbody>
+            </table>
+          </div>
+
+          <div class="text-muted small">All actions use REST APIs and update the interface dynamically.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="modal fade" id="contentModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Document Content</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="small text-muted mb-2" id="contentMeta"></div>
+        <pre class="content-view" id="contentPre"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="editAlertArea"></div>
+
+        <input type="hidden" id="editId">
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Client Reference</label>
+            <input type="text" class="form-control" id="editClientRef">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Document Type</label>
+            <select class="form-select" id="editDocType">
+              <option value="ID_PROOF">ID_PROOF</option>
+              <option value="ADDRESS_PROOF">ADDRESS_PROOF</option>
+              <option value="BANK_STATEMENT">BANK_STATEMENT</option>
+              <option value="SIGNED_FORM">SIGNED_FORM</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Filename</label>
+            <input type="text" class="form-control" id="editFilename">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Content Type</label>
+            <select class="form-select" id="editContentType">
+              <option value="text/plain">text/plain</option>
+            </select>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Replace Content</label>
+            <textarea class="form-control" id="editContent" rows="6" placeholder="Leave empty to keep existing content"></textarea>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" id="btnSaveEdit">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="statusModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Status</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="statusAlertArea"></div>
+
+        <input type="hidden" id="statusId">
+
+        <label class="form-label">New Status</label>
+        <select class="form-select mb-3" id="newStatus">
+          <option value="VALIDATED">VALIDATED</option>
+          <option value="QUEUED">QUEUED</option>
+          <option value="PROCESSED">PROCESSED</option>
+          <option value="REJECTED">REJECTED</option>
+        </select>
+
+        <label class="form-label">Reason</label>
+        <input type="text" class="form-control" id="statusReason" placeholder="Required for REJECTED">
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" id="btnSaveStatus">Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="deleteAlertArea"></div>
+
+        <input type="hidden" id="deleteId">
+
+        <p class="mb-2">Deletion is implemented as a logical delete by setting the status to REJECTED.</p>
+
+        <label class="form-label">Reason</label>
+        <input type="text" class="form-control" id="deleteReason" placeholder="Provide a short reason">
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-danger" id="btnConfirmDelete">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "6bd66d85-4d2c-4192-a28f-d6c01f412f85",
+    "clientRef": "CLI-5861",
+    "docType": "ID_PROOF",
+    "filename": "test1.txt",
+    "contentType": "text/plain",
+    "sizeBytes": 4,
+    "checksum": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+    "status": "REJECTED",
+    "reason": "to be deleted",
+    "createdAt": "2026-01-23T13:58:28.829Z",
+    "updatedAt": "2026-01-23T14:24:32.025Z"
+  },
+  {
+    "id": "1f3f3b2e-ffb5-47b9-8bf3-9920ef8c8be7",
+    "clientRef": "CLI-7924",
+    "docType": "SIGNED_FORM",
+    "filename": "form.txt",
+    "contentType": "text/plain",
+    "sizeBytes": 9,
+    "checksum": "45334454c93a735bef308bdbc1a1874dd59847e9b968cc3c38f79e7aba2fb041",
+    "status": "VALIDATED",
+    "reason": null,
+    "createdAt": "2026-01-23T14:24:55.845Z",
+    "updatedAt": "2026-01-23T14:24:55.845Z"
+  }
+]

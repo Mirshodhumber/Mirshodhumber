@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-01-23T14:01:09.609Z",
+  "date": "2026-01-23",
+  "total": 1,
+  "byStatus": {
+    "REJECTED": 1
+  },
+  "byDocType": {
+    "ADDRESS_PROOF": 1
+  },
+  "documents": [
+    {
+      "id": "6bd66d85-4d2c-4192-a28f-d6c01f412f85",
+      "clientRef": "CLI-5861",
+      "docType": "ADDRESS_PROOF",
+      "filename": "test.txt",
+      "contentType": "text/plain",
+      "sizeBytes": 4,
+      "checksum": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+      "status": "REJECTED",
+      "reason": "to be deleted",
+      "createdAt": "2026-01-23T13:58:28.829Z",
+      "updatedAt": "2026-01-23T13:59:35.528Z"
+    }
+  ]
+}
